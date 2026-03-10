@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的观鸟记录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .add-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .form-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .birds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .bird-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .bird-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .bird-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0),
+                        linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+
+        .bird-info {
+            padding: 20px;
+        }
+
+        .bird-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .bird-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .bird-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .delete-btn {
+            background: #ff4757;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .delete-btn:hover {
+            background: #ff3838;
+            box-shadow: 0 3px 10px rgba(255, 71, 87, 0.3);
+        }
+
+        .bird-notes {
+            color: #888;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: white;
+            padding: 60px 20px;
+        }
+
+        .empty-state h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .form-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐦 我的观鸟记录</h1>
+            <p>记录每一次与鸟类的美好相遇</p>
+        </header>
+
+        <div class="add-section">
+            <div class="form-group">
+                <input type="text" id="birdName" placeholder="输入鸟类名称（如：麻雀、白鹭、红嘴相思鸟）" required>
+                <input type="text" id="birdNotes" placeholder="备注信息（如：拍摄地点、时间、特点）">
+                <button onclick="addBird()">添加记录</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalCount">0</div>
+                <div class="stat-label">总记录数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="thisMonthCount">0</div>
+                <div class="stat-label">本月新增</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="uniqueCount">0</div>
+                <div class="stat-label">独特鸟类</div>
+            </div>
+        </div>
+
+        <div class="birds-grid" id="birdsGrid">
+            <div class="empty-state">
+                <h2>还没有观鸟记录</h2>
+                <p>输入鸟类名称，开始你的观鸟之旅吧！</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化数据
+        let birds = JSON.parse(localStorage.getItem('birdRecords')) || [];
+
+        // 页面加载时渲染
+        document.addEventListener('DOMContentLoaded', () => {
+            renderBirds();
+            updateStats();
+        });
+
+        // 添加鸟类记录
+        async function addBird() {
+            const name = document.getElementById('birdName').value.trim();
+            const notes = document.getElementById('birdNotes').value.trim();
+            
+            if (!name) {
+                alert('请输入鸟类名称');
+                return;
+            }
+
+            // 生成唯一ID
+            const id = Date.now().toString();
+            const date = new Date().toLocaleDateString('zh-CN');
+            
+            // 创建新记录
+            const newBird = {
+                id,
+                name,
+                notes,
+                date,
+                timestamp: Date.now(),
+                image: `https://source.unsplash.com/featured/?${encodeURIComponent(name)},bird`
+            };
+
+            // 添加到数组
+            birds.unshift(newBird);
+            saveBirds();
+            
+            // 清空输入框
+            document.getElementById('birdName').value = '';
+            document.getElementById('birdNotes').value = '';
+            
+            // 重新渲染
+            renderBirds();
+            updateStats();
+        }
+
+        // 删除记录
+        function deleteBird(id) {
+            if (confirm('确定要删除这条记录吗？')) {
+                birds = birds.filter(bird => bird.id !== id);
+                saveBirds();
+                renderBirds();
+                updateStats();
+            }
+        }
+
+        // 保存到本地存储
+        function saveBirds() {
+            localStorage.setItem('birdRecords', JSON.stringify(birds));
+        }
+
+        // 渲染鸟类卡片
+        function renderBirds() {
+            const grid = document.getElementById('birdsGrid');
+            
+            if (birds.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <h2>还没有观鸟记录</h2>
+                        <p>输入鸟类名称，开始你的观鸟之旅吧！</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = birds.map(bird => `
+                <div class="bird-card">
+                    <img src="${bird.image}" alt="${bird.name}" class="bird-image" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1555109307-f7d9da25c244?w=400'">
+                    <div class="bird-info">
+                        <h3 class="bird-name">${bird.name}</h3>
+                        <div class="bird-meta">
+                            <span class="bird-date">📅 ${bird.date}</span>
+                            <button class="delete-btn" onclick="deleteBird('${bird.id}')">删除</button>
+                        </div>
+                        ${bird.notes ? `<p class="bird-notes">✏️ ${bird.notes}</p>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 更新统计数据
+        function updateStats() {
+            const total = birds.length;
+            document.getElementById('totalCount').textContent = total;
+
+            // 本月新增
+            const now = new Date();
+            const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const thisMonthCount = birds.filter(bird => new Date(bird.timestamp) >= thisMonth).length;
+            document.getElementById('thisMonthCount').textContent = thisMonthCount;
+
+            // 独特鸟类数量
+            const uniqueNames = new Set(birds.map(bird => bird.name));
+            document.getElementById('uniqueCount').textContent = uniqueNames.size;
+        }
+
+        // 回车快捷添加
+        document.getElementById('birdName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addBird();
+            }
+        });
+    </script>
+</body>
+</html>
