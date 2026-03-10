@@ -48,6 +48,27 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #dee2e6;
+            font-size: 0.9rem;
+        }
+
+        .action-btn:hover {
+            background: #e9ecef;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
         .form-group {
             display: flex;
             gap: 15px;
@@ -221,6 +242,11 @@
         </header>
 
         <div class="add-section">
+            <div class="action-buttons">
+                <button class="action-btn" onclick="exportData()">📤 导出数据</button>
+                <button class="action-btn" onclick="importData()">📥 导入数据</button>
+                <button class="action-btn" onclick="clearAllData()">🗑️ 清空所有数据</button>
+            </div>
             <div class="form-group">
                 <input type="text" id="birdName" placeholder="输入鸟类名称（如：麻雀、白鹭、红嘴相思鸟）" required>
                 <input type="text" id="birdNotes" placeholder="备注信息（如：拍摄地点、时间、特点）">
@@ -282,7 +308,7 @@
                 notes,
                 date,
                 timestamp: Date.now(),
-                image: `https://source.unsplash.com/featured/?${encodeURIComponent(name)},bird`
+                image: `https://birdsearcher.com/api/image?name=${encodeURIComponent(name)}`
             };
 
             // 添加到数组
@@ -329,7 +355,7 @@
 
             grid.innerHTML = birds.map(bird => `
                 <div class="bird-card">
-                    <img src="${bird.image}" alt="${bird.name}" class="bird-image" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1555109307-f7d9da25c244?w=400'">
+                    <img src="${bird.image}" alt="${bird.name}" class="bird-image" loading="lazy" onerror="this.src='https://picsum.photos/seed/${encodeURIComponent(bird.name)}/400/200?bird'">
                     <div class="bird-info">
                         <h3 class="bird-name">${bird.name}</h3>
                         <div class="bird-meta">
@@ -364,6 +390,62 @@
                 addBird();
             }
         });
+
+        // 导出数据
+        function exportData() {
+            const data = JSON.stringify(birds, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `观鸟记录_${new Date().toLocaleDateString('zh-CN')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 导入数据
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const importedBirds = JSON.parse(event.target.result);
+                        if (Array.isArray(importedBirds)) {
+                            if (confirm('确定要导入数据吗？这会合并到现有记录中。')) {
+                                birds = [...birds, ...importedBirds];
+                                saveBirds();
+                                renderBirds();
+                                updateStats();
+                                alert('数据导入成功！');
+                            }
+                        } else {
+                            alert('无效的数据文件格式');
+                        }
+                    } catch (error) {
+                        alert('数据解析失败，请确保文件是有效的JSON格式');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // 清空所有数据
+        function clearAllData() {
+            if (confirm('确定要清空所有观鸟记录吗？此操作不可恢复！')) {
+                birds = [];
+                saveBirds();
+                renderBirds();
+                updateStats();
+                alert('所有数据已清空');
+            }
+        }
     </script>
 </body>
 </html>
